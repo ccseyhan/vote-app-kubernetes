@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: db-deploy
+  name: db
   labels:
     app: db
 spec:
@@ -15,10 +15,11 @@ spec:
         app: db
     spec:
       containers:
-      - name: db
+      - name: postgres
         image: postgres:15-alpine
         ports:
         - containerPort: 5432
+          name: postgres
         env:
           - name: POSTGRES_USER
             value: postgres
@@ -31,18 +32,20 @@ spec:
       - name: db-vol
         persistentVolumeClaim:
           claimName: db-pvc
-          
 
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: db-service
+  labels:
+    app: db
+  name: db
 spec:
+  type: ClusterIP
+  ports:
+  - name: "db-service"
+    port: 5432
+    targetPort: 5432
   selector:
     app: db
-  ports:
-    - protocol: TCP
-      port: 5432
-      targetPort: 5432

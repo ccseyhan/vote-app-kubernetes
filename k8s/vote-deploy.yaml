@@ -1,24 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: vote-deploy
   labels:
-    app: vote-app
+    app: vote
+  name: vote
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: vote-app
+      app: vote
   template:
     metadata:
       labels:
-        app: vote-app
+        app: vote
     spec:
       containers:
-      - name: vote
-        image: dockersamples/examplevotingapp_vote
+      - image: dockersamples/examplevotingapp_vote
+        name: vote
         ports:
         - containerPort: 80
+          name: vote
 
 
 ---
@@ -26,13 +27,16 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: vote-service
+  labels:
+    app: vote
+  name: vote
 spec:
   type: NodePort
-  selector:
-    app: vote-app
   ports:
-    - protocol: TCP
-      port: 5000
-      targetPort: 80
-      nodePort: 30002
+  - name: "vote-service"
+    port: 5000
+    targetPort: 80
+    nodePort: 30002
+  selector:
+    app: vote
+  

@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redis-deploy
   labels:
     app: redis
+  name: redis
 spec:
   replicas: 1
   selector:
@@ -15,22 +15,30 @@ spec:
         app: redis
     spec:
       containers:
-      - name: redis
-        image: redis:alpine
+      - image: redis:alpine
+        name: redis
         ports:
         - containerPort: 6379
-
-
+          name: redis
+        volumeMounts:
+        - mountPath: /data
+          name: redis-data
+      volumes:
+      - name: redis-data
+        emptyDir: {} 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
-  name: redis-service
+  labels:
+    app: redis
+  name: redis
 spec:
+  type: ClusterIP
+  ports:
+  - name: "redis-service"
+    port: 6379
+    targetPort: 6379
   selector:
     app: redis
-  ports:
-    - protocol: TCP
-      port: 6379
-      targetPort: 6379
+  
